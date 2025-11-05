@@ -1,0 +1,5 @@
+{
+  "name": "SFS-A STORE NEW UPDATE",
+  "description": "A dashboard-style inventory management system that uses Google Sheets as a database to manage customers, products, sales, stock, and vendors. Features include data visualization, CRUD operations, and low-stock notifications.",
+  "requestFramePermissions": []
+}
