@@ -13,36 +13,39 @@ export default async function handler(
     } catch (error) {
       return response.status(500).json({ error: (error as Error).message });
     }
-  } else if (request.method === 'POST') {
-    try {
-      const { name, category, quantity, sellingPrice } = request.body;
-      if (!name || !category || quantity === undefined || sellingPrice === undefined) {
-        return response.status(400).json({ error: 'Missing required fields' });
-      }
+ } else if (request.method === 'POST') {
+  try {
+    const { name, category, quantity, sellingPrice } = request.body;
 
-      // Generate next product ID
-      const lastIdResult = await query(`
-        SELECT id FROM products 
-        ORDER BY CAST(SUBSTRING(id FROM 2) AS INTEGER) DESC 
-        LIMIT 1;
-      `);
-      let nextId = 'P001';
-      if (lastIdResult.rows.length > 0) {
-        const lastId = lastIdResult.rows[0].id;
-        const lastNum = parseInt(lastId.substring(1), 10);
-        nextId = `P${String(lastNum + 1).padStart(3, '0')}`;
-      }
-      
-      await query(
-        'INSERT INTO products (id, name, category, quantity, "sellingPrice") VALUES ($1, $2, $3, $4, $5)',
-        [nextId, name, category, quantity, sellingPrice]
-      );
-      return response.status(201).json({ message: 'Product added successfully', newId: nextId });
-    } catch (error) {
-      return response.status(500).json({ error: (error as Error).message });
+    if (!name || !category || quantity == null || sellingPrice == null) {
+      return response.status(400).json({ error: 'Missing required fields' });
     }
-  } else {
-    response.setHeader('Allow', ['GET', 'POST']);
-    return response.status(405).end(`Method ${request.method} Not Allowed`);
+
+    // Yaha se ID generate hogi
+    const lastIdResult = await query(`
+      SELECT id FROM products
+      ORDER BY CAST(SUBSTRING(id FROM 2) AS INTEGER) DESC
+      LIMIT 1;
+    `);
+
+    let nextId = 'P001';
+    if (lastIdResult.rows.length > 0) {
+      const lastId = lastIdResult.rows[0].id; // Example: P003
+      const lastNum = parseInt(lastId.substring(1), 10); // 3
+      nextId = `P${String(lastNum + 1).padStart(3, '0')}`; // P004
+    }
+
+    // Insert product
+    await query(
+      `INSERT INTO products (id, name, category, quantity, "sellingPrice")
+      VALUES ($1, $2, $3, $4, $5)`,
+      [nextId, name, category, quantity, sellingPrice]
+    );
+
+    return response.status(201).json({ message: 'Product added successfully', id: nextId });
+
+  } catch (error) {
+    console.error("POST /products error:", error);
+    return response.status(500).json({ error: (error as Error).message });
   }
 }
