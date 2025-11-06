@@ -48,8 +48,8 @@ const Dashboard: React.FC = () => {
 
   const stats = useMemo(() => {
     const totalProducts = data.products.length;
-    const totalSalesAmount = data.sales.reduce((acc, sale) => acc + sale.totalPrice, 0);
-    const totalPurchaseAmount = data.purchases.reduce((acc, p) => acc + p.totalPurchasePrice, 0);
+    const totalSalesAmount = data.sales.reduce((acc, sale) => acc + Number(sale.totalPrice), 0);
+    const totalPurchaseAmount = data.purchases.reduce((acc, p) => acc + Number(p.totalPurchasePrice), 0);
     const profit = totalSalesAmount - totalPurchaseAmount;
 
     return { totalProducts, totalSalesAmount, totalPurchaseAmount, profit };
@@ -57,7 +57,8 @@ const Dashboard: React.FC = () => {
 
   const inventoryByCategory = useMemo(() => {
     const categoryMap = data.inventory.reduce((acc, item) => {
-        acc[item.category] = (acc[item.category] || 0) + item.stocks;
+       const qty = Number(item.stocks) || 0;
+    acc[item.category] = (acc[item.category] || 0) + qty;
         return acc;
     }, {} as Record<string, number>);
 
@@ -71,7 +72,7 @@ const Dashboard: React.FC = () => {
       .sort((a, b) => a.stocks - b.stocks)
       .map((item) => ({
   name: item.productName,
-  stocks: item.stocks,
+  stocks: Number(item.stocks) || 0,
 }));
 
   }, [data.inventory]);
