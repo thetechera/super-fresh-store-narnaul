@@ -476,7 +476,7 @@ const CrudPage = <T extends DataModel>({ title, dataKey, columns, readOnly = fal
 
   const dropdownOptions = useMemo(() => {
     if (dataKey === 'inventory') {
-      return columns.filter(c => ['name', 'category'].includes(c.accessor));
+      return columns.filter(c => ['productId', 'productName', 'category'].includes(c.accessor));
     }
     return columns.filter(c => c.sortable !== false);
   }, [columns, dataKey]);
