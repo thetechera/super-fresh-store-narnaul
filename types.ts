@@ -30,8 +30,8 @@ export interface Purchase {
 }
 
 export interface Inventory {
-  id: string;
-  name: string;
+  productId: string;
+  productName: string;
   category: string;
   initialQuantity: number;
   quantityPurchase: number;
@@ -125,8 +125,8 @@ export const getPurchaseColumns = (): Column<Purchase>[] => [
 ];
 
 export const getInventoryColumns = (): Column<Inventory>[] => [
-  { accessor: 'id', header: 'Product ID', sortable: true },
-  { accessor: 'name', header: 'Product Name', sortable: true },
+  { accessor: 'productId', header: 'Product ID', sortable: true },
+  { accessor: 'productName', header: 'Product Name', sortable: true },
   { accessor: 'category', header: 'Category', sortable: true },
   { accessor: 'initialQuantity', header: 'Initial Qty', sortable: true },
   { accessor: 'quantityPurchase', header: 'Purchased Qty', sortable: true },
