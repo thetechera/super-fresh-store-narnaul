@@ -28,6 +28,7 @@ export default async function handler(
         GROUP BY "productId"
       ) sales_sum
       ON p.id = sales_sum."productId";
+      ORDER BY p.id ASC;
     `);
 
     const inventoryWithStatus = rows.map(item => ({
