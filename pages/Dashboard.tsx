@@ -70,9 +70,10 @@ const Dashboard: React.FC = () => {
       .slice()
       .sort((a, b) => a.stocks - b.stocks)
       .map((item) => ({
-        name: item.name,
-        stocks: item.stocks,
-      }));
+  name: item.productName,
+  stocks: item.stocks,
+}));
+
   }, [data.inventory]);
 
 
@@ -86,9 +87,10 @@ const Dashboard: React.FC = () => {
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <DashboardCard title="Products" value={stats.totalProducts} icon={PackageIcon} color="bg-teal-500" />
-        <DashboardCard title="Purchase Amount" value={`₹${stats.totalPurchaseAmount.toFixed(2)}`} icon={ShoppingCartIcon} color="bg-sky-500" />
-        <DashboardCard title="Sales Amount" value={`₹${stats.totalSalesAmount.toFixed(2)}`} icon={TrendingUpIcon} color="bg-indigo-500" />
-        <DashboardCard title="Profit/Loss" value={`₹${stats.profit.toFixed(2)}`} icon={DollarSignIcon} color={stats.profit >= 0 ? "bg-cyan-500" : "bg-red-500"} />
+        <DashboardCard title="Purchase Amount" value={`₹${Number(stats.totalPurchaseAmount).toFixed(2)}`}
+        icon={ShoppingCartIcon} color="bg-sky-500" />
+        <DashboardCard title="Sales Amount" value={`₹${Number(stats.totalSalesAmount).toFixed(2)}`} icon={TrendingUpIcon} color="bg-indigo-500" />
+        <DashboardCard title="Profit/Loss" value={`₹${Number(stats.profit).toFixed(2)}`} icon={DollarSignIcon} color={stats.profit >= 0 ? "bg-cyan-500" : "bg-red-500"} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
