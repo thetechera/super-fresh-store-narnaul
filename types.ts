@@ -69,7 +69,8 @@ export const getProductColumns = (): Column<Product>[] => [
     accessor: 'sellingPrice',
     header: 'Unit Price',
     sortable: true,
-    render: (item: Product) => `₹${item.sellingPrice.toFixed(2)}`,
+    render: (item: Product) => `₹${Number(item.sellingPrice).toFixed(2)}`,
+
   },
 ];
 
@@ -88,13 +89,13 @@ export const getSaleColumns = (): Column<Sale>[] => [
     accessor: 'sellingPrice',
     header: 'Price Per Unit',
     sortable: true,
-    render: (item: Sale) => `₹${item.sellingPrice.toFixed(2)}`,
+    render: (item: Sale) => `₹${Number(item.sellingPrice).toFixed(2)}`,
   },
   {
     accessor: 'totalPrice',
     header: 'Total Price',
     sortable: true,
-    render: (item: Sale) => `₹${item.totalPrice.toFixed(2)}`,
+    render: (item: Sale) => `₹${Number(item.totalPrice).toFixed(2)}`,
   },
 ];
 
@@ -114,13 +115,13 @@ export const getPurchaseColumns = (): Column<Purchase>[] => [
     accessor: 'costPrice',
     header: 'Cost Per Unit',
     sortable: true,
-    render: (item: Purchase) => `₹${item.costPrice.toFixed(2)}`,
+    render: (item: Purchase) => `₹${Number(item.costPrice).toFixed(2)}`,
   },
   {
     accessor: 'totalPurchasePrice',
     header: 'Total Cost',
     sortable: true,
-    render: (item: Purchase) => `₹${item.totalPurchasePrice.toFixed(2)}`,
+    render: (item: Purchase) => `₹${Number(item.totalPurchasePrice).toFixed(2)}`,
   },
 ];
 
