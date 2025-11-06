@@ -8,8 +8,8 @@ export default async function handler(
   try {
     const { rows } = await query(`
       SELECT
-        p.id,
-        p.name,
+        p.id AS "productId",
+        p.name AS "productName",
         p.category,
         p.quantity AS "initialQuantity",
         COALESCE(purchases_sum.total_purchased, 0) AS "quantityPurchase",
@@ -18,11 +18,11 @@ export default async function handler(
       FROM
         products p
       LEFT JOIN
-        (SELECT productId, SUM(quantity) as total_purchased FROM purchases GROUP BY productId) AS purchases_sum
-        ON p.id = purchases_sum.productId
+        (SELECT productid, SUM(quantity) as total_purchased FROM purchases GROUP BY productid) AS purchases_sum
+        ON p.id = purchases_sum.productid
       LEFT JOIN
-        (SELECT productId, SUM(quantity) as total_sold FROM sales GROUP BY productId) AS sales_sum
-        ON p.id = sales_sum.productId;
+        (SELECT productid, SUM(quantity) as total_sold FROM sales GROUP BY productid) AS sales_sum
+        ON p.id = sales_sum.productid;
     `);
     
     // Add reorder status logic
