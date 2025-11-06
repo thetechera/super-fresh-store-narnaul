@@ -94,54 +94,67 @@ const Dashboard: React.FC = () => {
         <DashboardCard title="Profit/Loss" value={`₹${Number(stats.profit).toFixed(2)}`} icon={DollarSignIcon} color={stats.profit >= 0 ? "bg-cyan-500" : "bg-red-500"} />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-        <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-lg font-semibold text-gray-700 mb-4">Inventory by Category</h3>
-          <ResponsiveContainer width="100%" height={280}>
-            <PieChart>
-              <Pie data={inventoryByCategory} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} fill="#8884d8" label>
-                {inventoryByCategory.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip formatter={(value) => `${value} units`} />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
+     {/* NEW LAYOUT START */}
+
+
+  {/* Inventory Category Section */}
+  <div className="bg-white p-6 rounded-lg shadow-md flex flex-col lg:flex-row">
+
+    {/* Pie Chart */}
+    <div className="flex-1">
+      <h3 className="text-lg font-semibold text-gray-700 mb-4">Inventory by Category</h3>
+      <ResponsiveContainer width="100%" height={260}>
+        <PieChart>
+          <Pie
+            data={inventoryByCategory}
+            dataKey="value"
+            nameKey="name"
+            innerRadius={45}
+            outerRadius={85}
+            label
+          >
+            {inventoryByCategory.map((entry, index) => (
+              <Cell key={index} fill={COLORS[index % COLORS.length]} />
+            ))}
+          </Pie>
+          <Tooltip />
+        </PieChart>
+      </ResponsiveContainer>
+    </div>
+
+    {/* Category List / Legend */}
+    <div className="lg:w-1/3 w-full flex flex-col justify-center space-y-2 mt-6 lg:mt-0 lg:ml-6">
+      {inventoryByCategory.map((cat, idx) => (
+        <div key={idx} className="flex items-center space-x-2 text-sm">
+          <span className="h-3 w-3 rounded-sm" style={{ background: COLORS[idx % COLORS.length] }} />
+          <span className="text-gray-700">{cat.name}</span>
         </div>
-        <div className="lg:col-span-3 bg-white p-6 rounded-lg shadow-md flex flex-col">
-          <h3 className="text-lg font-semibold text-gray-700 mb-4">Product Stock Distribution</h3>
-           <div className="w-full flex-grow" style={{ height: '280px', overflowY: 'auto' }}>
-                <ResponsiveContainer width="100%" height={Math.max(280, stockData.length * 35)}>
-                    <BarChart
-                        layout="vertical"
-                        data={stockData}
-                        margin={{ top: 5, right: 30, left: 10, bottom: 5 }}
-                    >
-                        <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-                        <XAxis type="number" stroke="#6b7280" />
-                        <YAxis 
-                            dataKey="name" 
-                            type="category" 
-                            width={130} 
-                            tick={{ fontSize: 11, fill: '#374151' }} 
-                            stroke="#6b7280"
-                            interval={0}
-                        />
-                        <Tooltip 
-                            wrapperStyle={{ zIndex: 10, backgroundColor: '#fff', border: '1px solid #ccc', padding: '10px', borderRadius: '4px' }}
-                            formatter={(value: number) => [`${value} units`, 'Stock']}
-                        />
-                        <Bar dataKey="stocks" barSize={20}>
-                            {stockData.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                            ))}
-                        </Bar>
-                    </BarChart>
-                </ResponsiveContainer>
-           </div>
-        </div>
-      </div>
+      ))}
+    </div>
+
+  </div>
+
+  {/* Product Stock Distribution Section */}
+  <div className="bg-white p-6 rounded-lg shadow-md">
+    <h3 className="text-lg font-semibold text-gray-700 mb-4">Product Stock Distribution</h3>
+    <div style={{ height: `${Math.max(300, stockData.length * 40)}px` }}>
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart layout="vertical" data={stockData}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis type="number" />
+          <YAxis dataKey="name" type="category" width={150} />
+          <Tooltip formatter={(value) => [`${value} units`, 'Stock']} />
+          <Bar dataKey="stocks" barSize={20}>
+            {stockData.map((entry, index) => (
+              <Cell key={index} fill={COLORS[index % COLORS.length]} />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  </div>
+
+    {/* NEW LAYOUT END */}
     </div>
   );
 };
