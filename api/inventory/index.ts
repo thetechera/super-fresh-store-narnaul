@@ -27,7 +27,7 @@ export default async function handler(
         FROM sales
         GROUP BY "productId"
       ) sales_sum
-      ON p.id = sales_sum."productId";
+      ON p.id = sales_sum."productId"
       ORDER BY p.id ASC;
     `);
 
