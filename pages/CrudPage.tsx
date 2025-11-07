@@ -103,45 +103,48 @@ interface SalesModalProps {
     onSave: (item: Partial<Sale>) => void;
 }
 
+// ------------------ UPDATED SALES MODAL ------------------
 const SalesModal: React.FC<SalesModalProps> = ({ item, isMutating, onClose, onSave }) => {
     const { data: { products } } = useData();
+
+    type CartItem = {
+        productId: string;
+        productName: string;
+        quantity: number;
+        sellingPrice: number;
+        totalPrice: number;
+    };
+
+    const [cartItems, setCartItems] = useState<CartItem[]>([]);
+
+    const cartTotal = useMemo(
+        () => cartItems.reduce((sum, it) => sum + (Number(it.totalPrice) || 0), 0),
+        [cartItems]
+    );
+
     const [formData, setFormData] = useState({
         id: item?.id || undefined,
         date: item?.date ? new Date(item.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-        productId: item?.productId || '',
-        productName: item?.productName || '',
-        quantity: item?.quantity?.toString() || '1',
-        sellingPrice: item?.sellingPrice?.toString() || '',
-        totalPrice: item?.totalPrice?.toString() || '',
+        productId: '',
+        productName: '',
+        quantity: '1',
+        sellingPrice: '',
+        totalPrice: '',
     });
+
     const [productSearch, setProductSearch] = useState('');
     const [isDropdownVisible, setDropdownVisible] = useState(false);
 
     useEffect(() => {
-        if (item?.productId) {
-            const product = products.find(p => p.id === item.productId);
-            if (product) {
-                setProductSearch(product.name);
-            }
-        }
-    }, [item, products]);
-    
-    useEffect(() => {
-        const quantity = Number(formData.quantity) || 0;
-        const price = Number(formData.sellingPrice) || 0;
-        setFormData(prev => ({ ...prev, totalPrice: (quantity * price).toFixed(2) }));
+        const q = Number(formData.quantity) || 0;
+        const p = Number(formData.sellingPrice) || 0;
+        setFormData(prev => ({ ...prev, totalPrice: (q * p).toFixed(2) }));
     }, [formData.quantity, formData.sellingPrice]);
 
-
-    const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-    };
-
-    const handleProductSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setProductSearch(e.target.value);
-        if (!isDropdownVisible) setDropdownVisible(true);
-    };
+    const filteredProducts = useMemo(() =>
+        products.filter(p => p.name.toLowerCase().includes(productSearch.toLowerCase())),
+        [products, productSearch]
+    );
 
     const handleProductSelect = (product: Product) => {
         setProductSearch(product.name);
@@ -153,82 +156,132 @@ const SalesModal: React.FC<SalesModalProps> = ({ item, isMutating, onClose, onSa
             sellingPrice: product.sellingPrice.toString(),
         }));
     };
-    
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!formData.productId) { alert('Please select a product.'); return; }
-        onSave({
-            ...formData,
-            quantity: parseInt(formData.quantity, 10) || 0,
-            sellingPrice: parseFloat(formData.sellingPrice) || 0,
-            totalPrice: parseFloat(formData.totalPrice) || 0,
-        });
+
+    const handleAddToCart = () => {
+        if (!formData.productId) return alert('Select a product');
+        const qty = Number(formData.quantity) || 0;
+        const price = Number(formData.sellingPrice) || 0;
+
+        const newItem: CartItem = {
+            productId: formData.productId,
+            productName: formData.productName,
+            quantity: qty,
+            sellingPrice: price,
+            totalPrice: qty * price,
+        };
+
+        setCartItems(prev => [...prev, newItem]);
+
+        setFormData(prev => ({
+            ...prev,
+            quantity: '1',
+            totalPrice: (Number(prev.sellingPrice) || 0).toFixed(2),
+        }));
     };
-    
-    const filteredProducts = useMemo(() => 
-        products.filter(p => p.name.toLowerCase().includes(productSearch.toLowerCase())),
-        [products, productSearch]
-    );
+
+    const handleRemoveFromCart = (productId: string) => {
+        setCartItems(prev => prev.filter(p => p.productId !== productId));
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (cartItems.length === 0) {
+            return alert("Please add at least one product.");
+        }
+
+        try {
+            for (const c of cartItems) {
+                await onSave({
+                    date: formData.date,
+                    productId: c.productId,
+                    productName: c.productName,
+                    quantity: c.quantity,
+                    sellingPrice: c.sellingPrice,
+                    totalPrice: c.totalPrice,
+                });
+            }
+            onClose();
+        } catch (err) {
+            console.error(err);
+            alert('Failed to save sale.');
+        }
+    };
 
     return (
-         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4" role="dialog" aria-modal="true" aria-labelledby="sale-modal-title">
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-lg shadow-xl w-full max-w-lg flex flex-col">
                 <div className="bg-teal-600 p-4 rounded-t-lg">
-                    <h3 id="sale-modal-title" className="text-xl font-semibold text-white">{item?.id ? 'Edit' : 'Add'} Sale</h3>
+                    <h3 className="text-xl font-semibold text-white">Add Sale</h3>
                 </div>
+
                 <form onSubmit={handleSubmit}>
-                    <div className="p-6 space-y-4 overflow-y-auto max-h-[70vh]">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
-                           <div>
-                                <label htmlFor="id" className="block text-sm font-medium text-gray-700 mb-1">Sales ID</label>
-                                <input type="text" name="id" id="id" value={formData.id || 'Auto-generated'} readOnly className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 text-gray-800 sm:text-sm cursor-not-allowed" />
-                            </div>
-                            <div>
-                                <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1">Date</label>
-                                <input type="date" name="date" id="date" value={formData.date} onChange={handleFormChange} className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm" required />
-                            </div>
-                        </div>
+                    <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+
+                        <input type="date" name="date" value={formData.date}
+                            onChange={e => setFormData({ ...formData, date: e.target.value })}
+                            className="w-full border px-3 py-2 rounded" />
 
                         <div className="relative">
-                            <label htmlFor="productSearch" className="block text-sm font-medium text-gray-700 mb-1">Search Product</label>
-                            <input id="productSearch" type="text" value={productSearch} onChange={handleProductSearchChange} onFocus={() => setDropdownVisible(true)} onBlur={() => setTimeout(() => setDropdownVisible(false), 200)} placeholder="Start typing product name..." autoComplete="off" className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm" required />
+                            <label className="text-sm text-gray-700 mb-1 block">Search Product</label>
+                            <input value={productSearch} onChange={e => setProductSearch(e.target.value)}
+                                onFocus={() => setDropdownVisible(true)}
+                                onBlur={() => setTimeout(() => setDropdownVisible(false), 200)}
+                                className="border w-full px-3 py-2 rounded" />
+
                             {isDropdownVisible && filteredProducts.length > 0 && (
-                                <ul className="absolute z-20 w-full bg-white border border-gray-300 rounded-md mt-1 max-h-48 overflow-y-auto shadow-lg">
-                                    {filteredProducts.map(p => (<li key={p.id} className="px-3 py-2 hover:bg-teal-100 cursor-pointer text-sm text-gray-900" onMouseDown={() => handleProductSelect(p)}>{p.name}</li>))}
+                                <ul className="absolute bg-white border rounded w-full max-h-48 overflow-y-auto shadow">
+                                    {filteredProducts.map(p => (
+                                        <li key={p.id} className="px-3 py-2 hover:bg-teal-100 cursor-pointer"
+                                            onMouseDown={() => handleProductSelect(p)}>
+                                            {p.name}
+                                        </li>
+                                    ))}
                                 </ul>
                             )}
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                             <div>
-                                <label htmlFor="productName" className="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
-                                <input type="text" name="productName" id="productName" value={formData.productName} readOnly className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 text-gray-800 sm:text-sm cursor-not-allowed" />
-                            </div>
-                             <div>
-                                <label htmlFor="productId" className="block text-sm font-medium text-gray-700 mb-1">Product ID</label>
-                                <input type="text" name="productId" id="productId" value={formData.productId} readOnly className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 text-gray-800 sm:text-sm cursor-not-allowed" />
-                            </div>
-                        </div>
+                        <input type="number" min="1" value={formData.quantity}
+                            onChange={e => setFormData(prev => ({ ...prev, quantity: e.target.value }))}
+                            className="border px-3 py-2 rounded w-full" placeholder="Quantity" />
 
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                            <div>
-                                <label htmlFor="quantity" className="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
-                                <input type="number" name="quantity" id="quantity" value={formData.quantity} onChange={handleFormChange} className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm" required min="1" />
-                            </div>
-                            <div>
-                                <label htmlFor="sellingPrice" className="block text-sm font-medium text-gray-700 mb-1">Selling Price</label>
-                                <input type="text" name="sellingPrice" id="sellingPrice" value={formData.sellingPrice ? `₹${Number(formData.sellingPrice).toFixed(2)}` : ''} readOnly className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 text-gray-800 sm:text-sm" />
-                            </div>
-                             <div>
-                                <label htmlFor="totalPrice" className="block text-sm font-medium text-gray-700 mb-1">Total Price</label>
-                                <input type="text" name="totalPrice" id="totalPrice" value={formData.totalPrice ? `₹${Number(formData.totalPrice).toFixed(2)}` : ''} readOnly className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 text-gray-800 sm:text-sm" />
-                            </div>
-                        </div>
+                        <button type="button" onClick={handleAddToCart}
+                            className="w-full bg-teal-600 text-white py-2 rounded">
+                            Add to Sale
+                        </button>
+
+                        {cartItems.length > 0 && (
+                            <>
+                                <h4 className="text-md font-semibold text-gray-800 mt-4">Products Added</h4>
+                                <table className="w-full text-sm">
+                                    <tbody>
+                                        {cartItems.map(ci => (
+                                            <tr key={ci.productId} className="border-b">
+                                                <td className="py-1">{ci.productName}</td>
+                                                <td>{ci.quantity} x ₹{ci.sellingPrice}</td>
+                                                <td>₹{ci.totalPrice}</td>
+                                                <td>
+                                                    <button type="button" className="text-red-600 text-xs"
+                                                        onClick={() => handleRemoveFromCart(ci.productId)}>Remove</button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colSpan={2} className="text-right font-semibold px-2 py-2">Total:</td>
+                                            <td className="font-semibold">₹{cartTotal.toFixed(2)}</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </>
+                        )}
+
                     </div>
-                    <div className="bg-gray-50 p-4 flex justify-end space-x-3 rounded-b-lg">
-                        <button type="button" onClick={onClose} disabled={isMutating} className="px-5 py-2.5 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 text-sm font-medium disabled:opacity-50">Cancel</button>
-                        <button type="submit" disabled={isMutating} className="px-5 py-2.5 bg-teal-600 text-white rounded-md hover:bg-teal-700 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed">
-                            {isMutating ? 'Saving...' : 'Save Sale'}
+
+                    <div className="bg-gray-50 p-4 flex justify-end">
+                        <button type="submit" className="px-5 py-2 bg-teal-600 text-white rounded">
+                            Save Sale
                         </button>
                     </div>
                 </form>
