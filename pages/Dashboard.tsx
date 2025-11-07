@@ -123,14 +123,15 @@ const Dashboard: React.FC = () => {
     </div>
 
     {/* Category List / Legend */}
-    <div className="lg:w-1/3 w-full flex flex-col justify-center space-y-2 mt-6 lg:mt-0 lg:ml-6">
-      {inventoryByCategory.map((cat, idx) => (
-        <div key={idx} className="flex items-center space-x-2 text-sm">
-          <span className="h-3 w-3 rounded-sm" style={{ background: COLORS[idx % COLORS.length] }} />
-          <span className="text-gray-700">{cat.name}</span>
-        </div>
-      ))}
+   <div className="lg:w-1/3 w-full grid grid-cols-2 gap-y-2 mt-6 lg:mt-0 lg:ml-6">
+  {inventoryByCategory.map((cat, idx) => (
+    <div key={idx} className="flex items-center space-x-2 text-sm">
+      <span className="h-3 w-3 rounded-sm" style={{ background: COLORS[idx % COLORS.length] }} />
+      <span className="text-gray-700 truncate">{cat.name}</span>
     </div>
+  ))}
+</div>
+
 
   </div>
 
