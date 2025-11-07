@@ -250,33 +250,53 @@ const SalesModal: React.FC<SalesModalProps> = ({ item, isMutating, onClose, onSa
                             Add to Sale
                         </button>
 
-                        {cartItems.length > 0 && (
-                            <>
-                                <h4 className="text-md font-semibold text-gray-800 mt-4">Products Added</h4>
-                                <table className="w-full text-sm">
-                                    <tbody>
-                                        {cartItems.map(ci => (
-                                            <tr key={ci.productId} className="border-b">
-                                                <td className="py-1">{ci.productName}</td>
-                                               <td>{ci.quantity}</td>
-                                            <td>₹{ci.sellingPrice.toFixed(2)}</td>
-                                            <td>₹{ci.totalPrice.toFixed(2)}</td>
-                                             <td>
-                                                    <button type="button" className="text-red-600 text-xs"
-                                                        onClick={() => handleRemoveFromCart(ci.productId)}>Remove</button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <td colSpan={2} className="text-right font-semibold px-2 py-2">Total:</td>
-                                            <td className="font-semibold">₹{cartTotal.toFixed(2)}</td>
-                                        </tr>
+                       {cartItems.length > 0 && (
+                        <>
+                                       <h4 className="text-md font-semibold text-gray-800 mt-4">Products Added</h4>
+
+                                          <table className="w-full text-sm border-collapse">
+                                  <thead className="bg-gray-100 border-b text-gray-700">
+                               <tr>
+                                  <th className="py-2 px-2 text-left">Product</th>
+                                  <th className="py-2 px-2 text-center">Qty</th>
+                                  <th className="py-2 px-2 text-center">Price/Unit</th>
+                                 <th className="py-2 px-2 text-center">Total</th>
+                                  <th className="py-2 px-2 text-center">Action</th>
+                               </tr>
+                            </thead>
+
+                          <tbody>
+                               {cartItems.map(ci => (
+                               <tr key={ci.productId} className="border-b">
+                               <td className="py-2 px-2">{ci.productName}</td>
+                                 <td className="py-2 px-2 text-center">{ci.quantity}</td>
+                           <td className="py-2 px-2 text-center">₹{ci.sellingPrice.toFixed(2)}</td>
+                            <td className="py-2 px-2 text-center">₹{ci.totalPrice.toFixed(2)}</td>
+                                 <td className="py-2 px-2 text-center">
+                                    <button
+                                    type="button"
+                                      className="text-red-600 text-sm hover:underline"
+                                        onClick={() => handleRemoveFromCart(ci.productId)}
+                                      >
+                                          Remove
+                                         </button>
+                                              </td>
+                                              </tr>
+                                         ))}
+                                                </tbody>
+
+                                     <tfoot>
+                                             <tr className="font-semibold">
+                                             <td className="py-2 px-2 text-right" colSpan={3}>Total:</td>
+                                             <td className="py-2 px-2 text-center">₹{cartTotal.toFixed(2)}</td>
+                                    <td></td>
+                                    </tr>
                                     </tfoot>
-                                </table>
-                            </>
-                        )}
+                                     </table>
+                                        </>
+                                         )}
+
+                                  
 
                     </div>
 
