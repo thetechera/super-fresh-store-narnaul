@@ -145,6 +145,18 @@ const SalesModal: React.FC<SalesModalProps> = ({ item, isMutating, onClose, onSa
         products.filter(p => p.name.toLowerCase().includes(productSearch.toLowerCase())),
         [products, productSearch]
     );
+         const handleProductSelect = (product: Product) => {
+    setFormData(prev => ({
+        ...prev,
+        productId: product.id,
+        productName: product.name,
+        sellingPrice: product.sellingPrice.toString(),
+    }));
+
+    setProductSearch(product.name); // ✅ Show name in search input
+    setDropdownVisible(false);     // ✅ Close dropdown
+};
+
 
     const handleAddToCart = () => {
     if (!formData.productId) return alert('Select a product');
@@ -171,7 +183,7 @@ const SalesModal: React.FC<SalesModalProps> = ({ item, isMutating, onClose, onSa
         totalPrice: '',
     }));
 
-    setProductSearch(''); // ✅ Clear search input after add
+
 };
 
 
