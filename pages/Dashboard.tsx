@@ -66,16 +66,16 @@ const Dashboard: React.FC = () => {
   }, [data.inventory]);
 
   const stockData = useMemo(() => {
-    if (!data.inventory) return [];
-    return data.inventory
-      .slice()
-      .sort((a, b) => a.stocks - b.stocks)
-      .map((item) => ({
-  name: item.productName,
-  stocks: Number(item.stocks) || 0,
-}));
+  if (!data.inventory) return [];
+  return data.inventory
+    .filter(item => item.stocks <= 20) // 👈 Show only low stock
+    .sort((a, b) => a.stocks - b.stocks)
+    .map((item) => ({
+      name: item.productName,
+      stocks: Number(item.stocks) || 0,
+    }));
+}, [data.inventory]);
 
-  }, [data.inventory]);
 
 
   if (isInitialLoad) return <DashboardSkeleton />;
