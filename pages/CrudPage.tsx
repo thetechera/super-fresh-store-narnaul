@@ -258,9 +258,10 @@ const SalesModal: React.FC<SalesModalProps> = ({ item, isMutating, onClose, onSa
                                         {cartItems.map(ci => (
                                             <tr key={ci.productId} className="border-b">
                                                 <td className="py-1">{ci.productName}</td>
-                                                <td>{ci.quantity} x ₹{ci.sellingPrice}</td>
-                                                <td>₹{ci.totalPrice}</td>
-                                                <td>
+                                               <td>{ci.quantity}</td>
+                                            <td>₹{ci.sellingPrice.toFixed(2)}</td>
+                                            <td>₹{ci.totalPrice.toFixed(2)}</td>
+                                             <td>
                                                     <button type="button" className="text-red-600 text-xs"
                                                         onClick={() => handleRemoveFromCart(ci.productId)}>Remove</button>
                                                 </td>
@@ -279,12 +280,25 @@ const SalesModal: React.FC<SalesModalProps> = ({ item, isMutating, onClose, onSa
 
                     </div>
 
-                    <div className="bg-gray-50 p-4 flex justify-end">
-                        <button type="submit" className="px-5 py-2 bg-teal-600 text-white rounded">
-                            Save Sale
-                        </button>
-                    </div>
-                </form>
+                    <div className="bg-gray-50 p-4 flex justify-between rounded-b-lg">
+                     <button
+                         type="button"
+                         onClick={onClose}
+                         className="px-5 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition"
+                   >
+                      Cancel
+                    </button>
+
+                 <button
+                   type="submit"
+                disabled={isMutating}
+                  className="px-5 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 transition disabled:opacity-50"
+                 >
+                      {isMutating ? 'Saving...' : 'Save Sale'}
+                           </button>
+                         </div>
+
+              </form>
             </div>
         </div>
     );
