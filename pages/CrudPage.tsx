@@ -158,33 +158,39 @@ const SalesModal: React.FC<SalesModalProps> = ({ item, isMutating, onClose, onSa
 };
 
 
-    const handleAddToCart = () => {
-    if (!formData.productId) return alert('Select a product');
+   const handleAddToCart = () => {
+  if (!formData.productId) return alert('Select a product');
 
-    const qty = Number(formData.quantity) || 0;
-    const price = Number(formData.sellingPrice) || 0;
+  const qty = Number(formData.quantity) || 0;
+  const price = Number(formData.sellingPrice) || 0;
 
-    const newItem: CartItem = {
-        productId: formData.productId,
-        productName: formData.productName,
-        quantity: qty,
-        sellingPrice: price,
-        totalPrice: qty * price,
-    };
+  const newItem: CartItem = {
+    productId: formData.productId,
+    productName: formData.productName,
+    quantity: qty,
+    sellingPrice: price,
+    totalPrice: qty * price,
+  };
 
-    setCartItems(prev => [...prev, newItem]);
+  setCartItems(prev => [...prev, newItem]);
 
-    setFormData(prev => ({
-        ...prev,
-        productId: '',
-        productName: '',
-        sellingPrice: '',
-        quantity: '1',
-        totalPrice: '',
-    }));
+  // ✅ Reset form fields
+  setFormData(prev => ({
+    ...prev,
+    productId: '',
+    productName: '',
+    sellingPrice: '',
+    quantity: '1',
+    totalPrice: '',
+  }));
 
+  // ✅ Clear search input
+  setProductSearch('');
 
+  // ✅ Close dropdown
+  setDropdownVisible(false);
 };
+
 
 
 
