@@ -146,38 +146,35 @@ const SalesModal: React.FC<SalesModalProps> = ({ item, isMutating, onClose, onSa
         [products, productSearch]
     );
 
-    const handleProductSelect = (product: Product) => {
-        setProductSearch(product.name);
-        setDropdownVisible(false);
-        setFormData(prev => ({
-            ...prev,
-            productId: product.id,
-            productName: product.name,
-            sellingPrice: product.sellingPrice.toString(),
-        }));
-    };
-
     const handleAddToCart = () => {
-        if (!formData.productId) return alert('Select a product');
-        const qty = Number(formData.quantity) || 0;
-        const price = Number(formData.sellingPrice) || 0;
+    if (!formData.productId) return alert('Select a product');
 
-        const newItem: CartItem = {
-            productId: formData.productId,
-            productName: formData.productName,
-            quantity: qty,
-            sellingPrice: price,
-            totalPrice: qty * price,
-        };
+    const qty = Number(formData.quantity) || 0;
+    const price = Number(formData.sellingPrice) || 0;
 
-        setCartItems(prev => [...prev, newItem]);
-
-        setFormData(prev => ({
-            ...prev,
-            quantity: '1',
-            totalPrice: (Number(prev.sellingPrice) || 0).toFixed(2),
-        }));
+    const newItem: CartItem = {
+        productId: formData.productId,
+        productName: formData.productName,
+        quantity: qty,
+        sellingPrice: price,
+        totalPrice: qty * price,
     };
+
+    setCartItems(prev => [...prev, newItem]);
+
+    setFormData(prev => ({
+        ...prev,
+        productId: '',
+        productName: '',
+        sellingPrice: '',
+        quantity: '1',
+        totalPrice: '',
+    }));
+
+    setProductSearch(''); // ✅ Clear search input after add
+};
+
+
 
     const handleRemoveFromCart = (productId: string) => {
         setCartItems(prev => prev.filter(p => p.productId !== productId));
@@ -241,9 +238,18 @@ const SalesModal: React.FC<SalesModalProps> = ({ item, isMutating, onClose, onSa
                             )}
                         </div>
 
-                        <input type="number" min="1" value={formData.quantity}
+                        <div>
+                       <label className="text-sm text-gray-700 mb-1 block">Quantity</label>
+                      <input
+                            type="number"
+                            min="1"
+                            value={formData.quantity}
                             onChange={e => setFormData(prev => ({ ...prev, quantity: e.target.value }))}
-                            className="border px-3 py-2 rounded w-full" placeholder="Quantity" />
+                                  className="border px-3 py-2 rounded w-full"
+                                    placeholder="Enter Quantity"
+                                 />
+                                  </div>
+
 
                         <button type="button" onClick={handleAddToCart}
                             className="w-full bg-teal-600 text-white py-2 rounded">
