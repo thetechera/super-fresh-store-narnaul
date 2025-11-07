@@ -33,8 +33,8 @@ export default async function handler(
 
     const inventoryWithStatus = rows.map(item => ({
       ...item,
-      reorderLevel: 20,
-      reorderStatus: item.stocks <= 20 ? 'Low Stock' : 'In Stock'
+      reorderLevel: 10,
+      reorderStatus: item.stocks <= 10 ? 'Low Stock' : 'In Stock'
     }));
 
     return response.status(200).json(inventoryWithStatus);
