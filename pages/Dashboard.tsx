@@ -145,7 +145,7 @@ const Dashboard: React.FC = () => {
           <XAxis type="number" />
           <YAxis dataKey="name" type="category" width={150} />
           <Tooltip formatter={(value) => [`${value} units`, 'Stock']} />
-          <Bar dataKey="stocks" barSize={20}>
+          <Bar dataKey="stocks" barSize={10}>
             {stockData.map((entry, index) => (
               <Cell key={index} fill={COLORS[index % COLORS.length]} />
             ))}
