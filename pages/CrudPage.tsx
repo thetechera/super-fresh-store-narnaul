@@ -141,10 +141,21 @@ const SalesModal: React.FC<SalesModalProps> = ({ item, isMutating, onClose, onSa
         setFormData(prev => ({ ...prev, totalPrice: (q * p).toFixed(2) }));
     }, [formData.quantity, formData.sellingPrice]);
 
-    const filteredProducts = useMemo(() =>
-        products.filter(p => p.name.toLowerCase().includes(productSearch.toLowerCase())),
-        [products, productSearch]
-    );
+    const filteredProducts = useMemo(() => {
+  const search = productSearch.toLowerCase();
+  return products
+    .filter(p => p.name.toLowerCase().includes(search))
+    .sort((a, b) => {
+      const aName = a.name.toLowerCase();
+      const bName = b.name.toLowerCase();
+
+      const aStarts = aName.startsWith(search) ? 0 : 1;
+      const bStarts = bName.startsWith(search) ? 0 : 1;
+
+      return aStarts - bStarts;
+    });
+}, [products, productSearch]);
+
          const handleProductSelect = (product: Product) => {
     setFormData(prev => ({
         ...prev,
